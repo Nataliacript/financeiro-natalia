@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Minhas Despesas</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; }
+        
+        /* Estilo da Busca */
+        .search-box { width: 100%; padding: 12px; font-size: 16px; margin-bottom: 15px; border: 2px solid #007bff; border-radius: 6px; }
+        
+        /* Tabela Responsiva */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 800px; } /* min-width garante que as colunas não amassem */
+        
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background-color: #343a40; color: white; }
+        tr:hover { background-color: #e9ecef; }
+        
+        .btn { text-decoration: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; margin-right: 5px; color: white; }
+        .btn-edit { background-color: #ffc107; color: black; }
+        .btn-delete { background-color: #dc3545; }
+        .btn-novo { display: block; width: 100%; background-color: #28a745; color: white; padding: 12px; text-align: center; margin-bottom: 15px; border-radius: 6px; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📋 Meus Lançamentos</h1>
+    
+    <div style="text-align: right; margin-bottom: 10px;">
+        <a href="{% url 'logout' %}" style="color: red; text-decoration: none; font-weight: bold;">Sair do Sistema</a>
+    </div>
+
+    <!-- Botão Novo Lançamento -->
+    <a href="{% url 'home' %}" class="btn-novo">+ Novo Lançamento</a>
+
+    <!-- Barra de Busca -->
+    <input type="text" id="searchInput" class="search-box" placeholder="🔍 Pesquisar por data, categoria, origem, valor...">
+
+    <!-- Tabela -->
+    <div class="table-responsive">
+        <table id="minhaTabela">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Origem</th>
+                    <th>Categoria</th>
+                    <th>Subcategoria</th>
+                    <th>Número</th>
+                    <th>Valor</th>
+ 	        <th>Info</th>
+                    <th>Descricao</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in despesas %}
+                <tr>
+                    <td>{{ item.data|date:"d/m/Y" }}</td>
+                    <td>{{ item.origem }}</td>
+                    <td>{{ item.categoria }}</td>
+                    <td>{{ item.subcategoria }}</td>
+                    <td>{{ item.numero }}</td>
+                    <td>R$ {{ item.valor }}</td>
+                   <td> {{ item.info }}</td>
+                   <td> {{ item.descricao }}</td>
+                    <td>
+                        <a href="{% url 'editar_despesa' item.id %}" class="btn btn-edit">Editar</a>
+                        <a href="{% url 'excluir_despesa' item.id %}" class="btn btn-delete" onclick="return confirm('Tem certeza que deseja excluir este item?')">Excluir</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 20px;">Nenhuma despesa encontrada.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- SCRIPT PARA FILTRAR EM TEMPO REAL -->
+<script>
+    var input = document.getElementById("searchInput");
+    var table = document.getElementById("minhaTabela");
+    var tr = table.getElementsByTagName("tr");
+
+    input.addEventListener("keyup", function() {
+        var filter = input.value.toUpperCase();
+        
+        // Começa do 1 para pular o cabeçalho (index 0)
+        for (var i = 1; i < tr.length; i++) {
+            var tds = tr[i].getElementsByTagName("td");
+            var match = false;
+            
+            // Verifica se alguma das colunas da linha contém o texto pesquisado
+            for (var j = 0; j < tds.length; j++) {
+                if (tds[j]) {
+                    if (tds[j].textContent.toUpperCase().indexOf(filter) > -1) {
+                        match = true;
+                        break; // Se achou em uma coluna, para de procurar nessa linha
+                    }
+                }
+            }
+            
+            // Se achou match, mostra a linha, senão esconde
+            if (match) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
+
