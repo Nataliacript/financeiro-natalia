@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Despesa</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        select, input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; background-color: #007bff; color: white; padding: 15px; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Editar Despesa</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        <button type="submit">Salvar Alterações</button>
+    </form>
+    
+    <p style="text-align: center; margin-top: 20px;">
+        <a href="{% url 'lista_despesas' %}">Cancelar e Voltar</a>
+    </p>
+</div>
+
+<!-- MESMO SCRIPT DA PÁGINA INICIAL PARA O DROPDOWN FUNCIONAR -->
+<script>
+    const idCategoria = document.getElementById('id_categoria');
+    const idSubcategoria = document.getElementById('id_subcategoria');
+
+    const opcoesSubcategoria = {
+        'alimentacao': [
+            {val: 'cafe_pao', txt: 'Café - Pão'},
+            {val: 'cafe_manteiga', txt: 'Café - Manteiga'},
+            {val: 'cafe_ovo', txt: 'Café - Ovo'},
+            {val: 'almoco_arroz', txt: 'Almoço - Arroz'},
+            {val: 'almoco_feijao', txt: 'Almoço - Feijão'}
+        ],
+        'lazer': [
+            {val: 'lazer_cinema', txt: 'Cinema'},
+            {val: 'lazer_jogo', txt: 'Jogos'}
+        ],
+        'transporte': []
+    };
+
+    function atualizarSubcategorias() {
+        const categoriaSelecionada = idCategoria.value;
+        const valorOriginal = idSubcategoria.value; // Pega o valor atual selecionado
+
+        idSubcategoria.innerHTML = ''; 
+
+        if (opcoesSubcategoria[categoriaSelecionada]) {
+            opcoesSubcategoria[categoriaSelecionada].forEach(opcao => {
+                const novaOpcao = document.createElement('option');
+                novaOpcao.value = opcao.val;
+                novaOpcao.textContent = opcao.txt;
+                idSubcategoria.appendChild(novaOpcao);
+            });
+        }
+        
+        // Tenta manter o valor selecionado se ele existir na nova lista
+        if(valorOriginal) {
+            idSubcategoria.value = valorOriginal;
+        }
+    }
+
+    idCategoria.addEventListener('change', atualizarSubcategorias);
+    window.addEventListener('load', atualizarSubcategorias);
+</script>
+
+</body>
+</html>
